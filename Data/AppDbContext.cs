@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using ProjectAndTaskManagement.Models.Scaffolded;
+using ProjectAndTaskManagement.Models;
 
 namespace ProjectAndTaskManagement.Data;
 
 public partial class AppDbContext : DbContext
 {
+    public AppDbContext()
+    {
+    }
+
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
     {
@@ -42,6 +46,11 @@ public partial class AppDbContext : DbContext
             entity.HasIndex(e => e.ProjectId, "IX_TaskItems_ProjectId");
 
             entity.HasOne(d => d.Assignee).WithMany(p => p.TaskItems).HasForeignKey(d => d.AssigneeId);
+
+            entity.HasOne(d => d.Category).WithMany(p => p.TaskItems)
+                .HasForeignKey(d => d.CategoryId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_taskitems_categoryid");
 
             entity.HasOne(d => d.Project).WithMany(p => p.TaskItems).HasForeignKey(d => d.ProjectId);
         });
